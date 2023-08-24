@@ -32,19 +32,11 @@
             "args": [
                 "watch",
                 "run",
-                "--project",
-                "${workspaceFolder}/API/API.csproj"
+                "${workspaceFolder}/API/API.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
-        },
-        {
-            "type": "npm",
-            "script": "build",
-            "path": "client-app",
-            "group": "build",
-            "problemMatcher": [],
-            "label": "npm: build - client-app",
-            "detail": "react-scripts build"
         }
     ]
 }

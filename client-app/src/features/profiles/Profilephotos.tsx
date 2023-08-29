@@ -14,7 +14,7 @@ import { id } from "date-fns/locale";
 interface Props {
     profile: Profile;
 }
-export default observer(function profileProfile({ profile }: Props) {
+export default observer(function ProfileProfile({ profile }: Props) {
     const { profileStore: { isCurrentUser, uploadphoto, uploading, loading, setMainPhoto, deletePhoto } } = useStore();
     const [addPhotoMode, setPhotoMode] = useState(false);
     const [target, setTarget] = useState('')

@@ -10,7 +10,7 @@ import { useStore } from "../../app/stores/store";
 interface Props{
     profile :Profile
 }
-export default observer( function profileContent ({profile}: Props){
+export default observer( function ProfileContent ({profile}: Props){
     const {profileStore} = useStore()
 
     const  panes  = [

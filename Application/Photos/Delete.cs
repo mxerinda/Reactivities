@@ -48,7 +48,7 @@ namespace Application.Photos
 
                if(photo == null) return null;
 
-               if(photo.IsMain) return Result<Unit>.Failure("You cannot delete ypur maon photo");
+               if(photo.IsMain) return Result<Unit>.Failure("You cannot delete your main photo");
 
                var result = await _photoAccessor.DeletePhoto(photo.id);
 

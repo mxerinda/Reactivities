@@ -20,27 +20,21 @@ namespace Application.Photos
 
         public class Handler : IRequestHandler<Command, Result<Unit>>
         {
-
-        private readonly IPhotoAccessor _photoAccessor;
-      
-        private readonly DataContext _context;
-        private readonly IuserAccessor _userAccessor;
-     
+        private readonly DataContext context;
+        private readonly IPhotoAccessor photoAccessor;
+        private readonly IuserAccessor userAccessor;
         public Handler (DataContext context,IPhotoAccessor photoAccessor,IuserAccessor userAccessor)
             {
-            _userAccessor = userAccessor;
-        
-            _context = context;
-            _photoAccessor = photoAccessor;
-            _userAccessor = userAccessor;
-            
+            this.photoAccessor = photoAccessor;
+            this.userAccessor = userAccessor;
+            this.context = context;
                 
             }
 
             public  async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-               var user = await _context.Users.Include(p => p.Photos)
-               .FirstOrDefaultAsync( x => x.UserName == _userAccessor.GetUsername());
+               var user = await context.Users.Include(p => p.Photos)
+               .FirstOrDefaultAsync( x => x.UserName == userAccessor.GetUsername());
                if(user == null) return null;
 
 
@@ -48,15 +42,15 @@ namespace Application.Photos
 
                if(photo == null) return null;
 
-               if(photo.IsMain) return Result<Unit>.Failure("You cannot delete your main photo");
+               if(photo.IsMain) return Result<Unit>.Failure("You cannot delete ypur maon photo");
 
-               var result = await _photoAccessor.DeletePhoto(photo.id);
+               var result = await photoAccessor.DeletePhoto(photo.id);
 
                if(result == null) return Result<Unit>.Failure("Problem deleting photo from Cloudinary");
 
                user.Photos.Remove(photo);
 
-               var Success = await _context.SaveChangesAsync() >0;
+               var Success = await context.SaveChangesAsync() >0;
 
                if (Success) return Result<Unit>.Success(Unit.Value);
 

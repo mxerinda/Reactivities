@@ -21,21 +21,21 @@ namespace Application.Profiles
 
         public class Handler : IRequestHandler<Query, Result<Profile>>
         {
-        private readonly DataContext _context;
-        private readonly IMapper _mapper;
-        private readonly IuserAccessor _userAccessor;
+        private readonly DataContext context;
+        private readonly IMapper mapper;
+        private readonly IuserAccessor userAccessor;
         public Handler(DataContext context,IMapper mapper,IuserAccessor userAccessor)
             {
-            _userAccessor = userAccessor;
-            _mapper = mapper;
-            _context = context;
+            this.userAccessor = userAccessor;
+            this.mapper = mapper;
+            this.context = context;
           
               
             }
             public async Task<Result<Profile>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var user = await _context.Users
-                .ProjectTo<Profile>(_mapper.ConfigurationProvider, new {currentUsername = _userAccessor.GetUsername()})
+                var user = await context.Users
+                .ProjectTo<Profile>(mapper.ConfigurationProvider,new { currentUsername = userAccessor.GetUsername() })
                 .FirstOrDefaultAsync(x => x.Username == request.UserName);
 
                 if (user == null) return null;

@@ -10,31 +10,30 @@ import ActivityDetailedChat from './ActivityDetailedChat';
 import ActivityDetailedSidebar from './ActivityDetailedSidebar';
 
 
-export default observer(function ActivityDetails() {
-  const { activityStore } = useStore();
-  const { selectedActivity: activity, loadActivity, loadingInitial,clearSelectedActivity } = activityStore;
-  const { id } = useParams();
+export default observer(function ActivityDetails(){
+  const {activityStore} = useStore();
+const {selectedActivity:activity,loadActivity,loadingInitial,clearSelectedActivity} = activityStore;
+const {id} =useParams();
 
-  useEffect(() => {
-    
-    if (id) loadActivity(id);
-    return () => clearSelectedActivity();
+useEffect(()=>{
+  if(id) loadActivity(id);
+  return ()=> clearSelectedActivity();
 
-  }, [id, loadActivity,clearSelectedActivity])
+},[id,loadActivity,clearSelectedActivity])
 
-  if (loadingInitial || !activity) return <LoadingComponent />;
+if( loadingInitial||!activity) return <LoadingComponent/>;
 
-  return (
-    <Grid>
-      <Grid.Column width={10}>
-        <ActivityDetailedHeader activity={activity} />
-        < ActivityDetailedInfo activity={activity} />
-        < ActivityDetailedChat activityId={activity.id} />
-
-      </Grid.Column >
-      <Grid.Column width={6}>
-        < ActivityDetailedSidebar activity={activity} />
-      </Grid.Column>
-    </Grid>
-  )
-})
+    return(
+       <Grid>
+        <Grid.Column width={10}>
+          <ActivityDetailedHeader activity={activity}/>
+          < ActivityDetailedInfo activity={activity}/>
+             < ActivityDetailedChat activityId={activity.id}/>
+          
+        </Grid.Column >
+        <Grid.Column width={6}>
+             < ActivityDetailedSidebar activity={activity}/>
+        </Grid.Column>
+       </Grid>
+    )
+  })

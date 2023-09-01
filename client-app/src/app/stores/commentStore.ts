@@ -1,42 +1,45 @@
 import { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import { ChatComment } from "../models/comment";
+import { ChatComment } from "../models/Comment";
 import { makeAutoObservable, runInAction } from "mobx";
 import { store } from "./store";
+import { error } from "console";
 
-export default class CommentStore {
-    comment: ChatComment[] = [];
-    hubConnection: HubConnection | null = null;
+export default class CommentStore{
+    comments:ChatComment[]=[];
+    hubConnection : HubConnection | null =null;
 
-    constructor() {
+    constructor(){
         makeAutoObservable(this);
     }
 
-
-    createHubConnection = (activityId: string) => {
-
-        if (store.activityStore.selectedActivity) {
+    createHubConnection = (activityId:string) =>{
+        if(store.activityStore.selectedActivity){
             this.hubConnection = new HubConnectionBuilder()
-                .withUrl('http://localhost:5000/chat?activityId=' + activityId, {
-                    accessTokenFactory: () => store.userStore.user?.token!
-                })
-                .withAutomaticReconnect()
-                .configureLogging(LogLevel.Information)
-                .build();
+            .withUrl('http://localhost:5000/chat?activityId=' +activityId,{
+                accessTokenFactory:()=>store.userStore.user?.token!
+            })
+            .withAutomaticReconnect()
+            .configureLogging(LogLevel.Information).build();
 
-            this.hubConnection.start().catch(error => console.log("Could not Connect!"));
+            this.hubConnection.start().catch(error =>console.log('Error establishing the connection'));
 
-            this.hubConnection.on("LoadComments", (comments: ChatComment[]) => {
-                runInAction(() => {
-                    comments.forEach(comment => {
-                        comment.createdAt = new Date(comment.createdAt + 'Z');
+            this.hubConnection.on('LoadComments' , (comments:ChatComment[]) =>{
+                runInAction(()=>{
+                    comments.forEach(comment =>{
+                        comment.createdAt =new Date(comment.createdAt +'Z');
                     })
-                    this.comment = comments
+                    this.comments = comments
                 });
             })
-            this.hubConnection.on('RecieveComment', (comment: ChatComment) => {
-                runInAction(() => {
-                    comment.createdAt = new Date(comment.createdAt);
-                    this.comment.unshift(comment)
+
+
+
+            this.hubConnection.on('ReceiveComments' , (comment:ChatComment) =>{
+                runInAction(()=> {
+                    comment.createdAt =new Date(comment.createdAt);
+                    this.comments.unshift(comment)
+                
+                
                 });
             })
 
@@ -44,23 +47,24 @@ export default class CommentStore {
         }
     }
 
-
-    stopHubConnection = () => {
-        this.hubConnection?.stop().catch((error: any) => console.log('Error Stopping the Connection', error))
+    stopHubConnection =() =>{
+        this.hubConnection?.stop().catch(error => console.log('Error stopping connection',error))
     }
-    clearComments = () => {
-        this.comment = [];
+
+    clearComments = () =>{
+        this.comments=[];
         this.stopHubConnection();
+
     }
 
-    addComment = async (values: any) => {
-        values.activityId = store.activityStore.selectedActivity?.id;
-        try {
-            await this.hubConnection?.invoke('SendComment', values);
-        } catch (error) {
+    addComment =async (values :any)=>{
+        values.activityId = store.activityStore.selectedActivity!.id;
+
+        try{
+            await this.hubConnection?.invoke('SendComment',values);
+
+        }catch(error){
             console.log(error);
         }
     }
 }
-
-

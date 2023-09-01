@@ -33,20 +33,19 @@ namespace API.Extensions
 
                 };
 
-                opt.Events = new JwtBearerEvents 
+                opt.Events = new JwtBearerEvents
                 {
-                    OnMessageReceived = context => 
+                    OnMessageReceived = context =>
                     {
-                        var AccessToken = context.Request.Query["access_token"];
+                        var accesToken =context.Request.Query["access_token"];
                         var path = context.HttpContext.Request.Path;
-
-                        if(!string.IsNullOrEmpty(AccessToken) && (path.StartsWithSegments("/chat")))
+                        if(!string.IsNullOrEmpty(accesToken) && path.StartsWithSegments("/chat")) 
                         {
-                            context.Token = AccessToken;
+                            context.Token = accesToken;
                         }
                         return Task.CompletedTask;
-                    }
 
+                    }
                 };
             });
 

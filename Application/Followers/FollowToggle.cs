@@ -13,53 +13,55 @@ namespace Application.Followers
 {
     public class FollowToggle
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command :IRequest<Result<Unit>>
         {
-            public string TargetUser { get; set; }
+            public string TargetUserName { get; set;}        
         }
 
         public class Handler : IRequestHandler<Command, Result<Unit>>
         {
+         private readonly DataContext Context;
+        private readonly IuserAccessor userAccessor;
 
-            private readonly DataContext _context;
-            private readonly IuserAccessor _userAccessor;
-            public Handler(DataContext context, IuserAccessor userAccessor)
+        public Handler (DataContext context,IuserAccessor userAccessor)
             {
-                _context = context;
-                _userAccessor = userAccessor;
-
+            this.userAccessor = userAccessor;
+            this.Context = context;
+          
+                
             }
-
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public  async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var observer = await _context.Users.FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
-                var target = await _context.Users.FirstOrDefaultAsync(x => x.UserName == request.TargetUser);
+               var observer = await Context.Users.FirstOrDefaultAsync(x =>
+                x.UserName == userAccessor.GetUsername());
 
-                if (target == null) return null;
+                var target = await Context.Users.FirstOrDefaultAsync(x =>
+                x.UserName == request.TargetUserName);
 
-                var Following = await _context.UserFollowings.FindAsync(observer.Id, target.Id);
+                if(target == null) return null;
 
-                if (Following == null)
-                {
-                    Following = new UserFollowing
+                var following =  await Context.UserFollowings.FindAsync(observer.Id,target.Id);
+
+                if(following == null){
+
+                    following = new UserFollowing
                     {
                         Observer = observer,
-                        Target = target,
+                        Target = target
                     };
-                    _context.UserFollowings.Add(Following);
+
+                    Context.UserFollowings.Add(following);
                 }
                 else{
-                    _context.UserFollowings.Remove(Following);
+                    Context.UserFollowings.Remove(following);
                 }
-                var success = await _context.SaveChangesAsync() >0;
 
+                var success = await Context.SaveChangesAsync() > 0;
+                
                 if(success) return Result<Unit>.Success(Unit.Value);
 
-                return Result<Unit>.Failure("Could not make a following");
-
+                return Result<Unit>.Failure("Failed to update following");
             }
         }
     }
-
-
 }
